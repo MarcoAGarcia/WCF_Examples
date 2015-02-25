@@ -16,8 +16,15 @@ class Program
 
     static async Task MainAsync()
     {
+        var accountKey = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_BingSearchAccountKey");
+        if (accountKey == null)
+        {
+            var arg = Environment.GetCommandLineArgs().Where(a => a.StartsWith("/bing:")).FirstOrDefault();
+            if (arg != null) accountKey = arg.Substring(6).Trim("'\"".ToCharArray());
+        }
+
         var bing = new BingSearchContainer(new Uri("https://api.datamarket.azure.com/Bing/Search"));
-        bing.Credentials = new NetworkCredential("accountKey", "QfLwr+UjetjpuH1KDXvIS0+KeHOUp/P7nlWa02KyjDI");
+        bing.Credentials = new NetworkCredential("accountKey", accountKey);
         var q = bing
                 .Image("big noses", null, null, null, null, null, "Size:Width:1000")
                 .AddQueryOption("$top", 10);

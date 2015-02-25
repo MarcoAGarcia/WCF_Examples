@@ -8,16 +8,11 @@ Module Module1
     End Sub
 
     Async Function MainAsync() As Task
-        Dim accountKey As String
-        Dim args = Environment.GetCommandLineArgs()
-        If args.Length >= 2 Then
-            accountKey = args(1)
-            Console.WriteLine("BING using account key from first command-line argument")
-        Else
-            Console.Error.WriteLine("BING can't find account-key in command-line")
-            Return
+        Dim accountKey = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_BingSearchAccountKey")
+        If accountKey Is Nothing Then
+            Dim arg = (From a In Environment.GetCommandLineArgs() Where a.StartsWith("/bing:")).FirstOrDefault
+            If arg IsNot Nothing Then accountKey = arg.Substring(6).Trim({""""c, "'"c})
         End If
-
 
         Dim bing As New BingSearchContainer(New Uri("https://api.datamarket.azure.com/Bing/Search"))
         bing.Credentials = New NetworkCredential("accountKey", accountKey)

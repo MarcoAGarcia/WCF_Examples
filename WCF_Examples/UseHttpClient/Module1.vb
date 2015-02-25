@@ -13,8 +13,14 @@ Module Module1
     End Sub
 
     Async Function MainAsync() As Task
+        Dim accountKey = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_BingSearchAccountKey")
+        If accountKey Is Nothing Then
+            Dim arg = (From a In Environment.GetCommandLineArgs() Where a.StartsWith("/bing:")).FirstOrDefault
+            If arg IsNot Nothing Then accountKey = arg.Substring(6).Trim({""""c, "'"c})
+        End If
+
         Dim client As New HttpClient
-        client.DefaultRequestHeaders.Authorization = New AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("accountKey:QfLwr+UjetjpuH1KDXvIS0+KeHOUp/P7nlWa02KyjDI")))
+        client.DefaultRequestHeaders.Authorization = New AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("accountKey:" & accountKey)))
         '
         Dim q = "https://api.datamarket.azure.com/Bing/Search/Image"
         q &= "?Query='crazy+big+nose'"
